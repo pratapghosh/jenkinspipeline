@@ -1,5 +1,12 @@
 pipeline{
 
+properties([
+    parameters([
+       choice(choices: 'none\nS4\nSM\nGB\nPD\nSSP\nADE\nDMS\nNDA\nIMS\nOWB\nRetail\nMinerva\nSpotBuy\nSupplierRisk\nS4_AllMicroservices\nS2C_All\nCatalogCMS\nSSP_AllMicroservices\nAll', description: 'Choose the product to compare the tags', name: 'ProductName'),
+       choice(choices: 'All\nUS\nCN\nRU\nEU\nAU\nKSA\nUAE\nPROD3', description: 'Choose the product to compare the tags', name: 'DataCenter')
+    ])
+])
+
 agent any
 stages 
 {
