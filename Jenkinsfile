@@ -1,35 +1,61 @@
-properties([
-    parameters([
-       choice(choices: 'none\nS4\nSM\nGB\nPD\nSSP\nADE\nDMS\nNDA\nIMS\nOWB\nRetail\nMinerva\nSpotBuy\nSupplierRisk\nS4_AllMicroservices\nS2C_All\nCatalogCMS\nSSP_AllMicroservices\nAll', description: 'Choose the product to compare the tags', name: 'ProductName'),
-       choice(choices: 'All\nUS\nCN\nRU\nEU\nAU\nKSA\nUAE\nPROD3', description: 'Choose the product to compare the tags', name: 'DataCenter'),
-       choice(choices: 'Production Sanity\nOneStrike', description: 'Purpose for the run', name: 'Purpose')
-    ])
-])
+pipeline {
+    agent any
 
-pipeline{
+    // this section configures Jenkins options
+    options {
 
+        // only keep 10 logs for no more than 10 days
+        buildDiscarder(logRotator(daysToKeepStr: '10', numToKeepStr: '10'))
 
+        // cause the build to time out if it runs for more than 12 hours
+        timeout(time: 12, unit: 'HOURS')
 
-agent any
-stages 
-{
-stage('Build') 
-{
-steps{
-echo "Building the Project.........."
-}
-}
-stage('Test') 
-{
-steps{
-echo "Testing the Project.........."
-}
-}
-stage('Deploy') 
-{
-steps{
-echo "Deploying the Project.........."
-}
-}
-}
+        // add timestamps to the log
+        timestamps()
+    }
+
+    // this section configures triggers
+    triggers {
+          // create a cron trigger that will run the job every day at midnight
+          // note that the time is based on the time zone used by the server
+          // where Jenkins is running, not the user's time zone
+          cron '@midnight'
+    }
+
+    // the pipeline section we all know and love: stages! :D
+    stages {
+        stage('Requirements') {
+            steps {
+                echo 'Installing requirements...'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building..'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+            }
+        }
+        stage('Report') {
+            steps {
+                echo 'Reporting....'
+            }
+        }
+    }
+
+    // the post section is a special collection of stages
+    // that are run after all other stages have completed
+    post {
+
+        // the always stage will always be run
+        always {
+
+            // the always stage can contain build steps like other stages
+            // a "steps{...}" section is not needed.
+            echo "This step will run after all other steps have finished.  It will always run, even in the status of the build is not SUCCESS"
+        }
+    }
 }
